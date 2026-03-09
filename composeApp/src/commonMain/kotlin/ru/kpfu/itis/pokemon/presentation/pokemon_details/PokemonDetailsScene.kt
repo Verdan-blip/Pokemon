@@ -1,5 +1,6 @@
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,12 +18,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -34,26 +39,62 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
 import coil3.compose.SubcomposeAsyncImage
 import org.jetbrains.compose.resources.painterResource
 import pokemon.composeapp.generated.resources.Res
+import pokemon.composeapp.generated.resources.ic_back
 import pokemon.composeapp.generated.resources.img_failure
 import ru.kpfu.itis.pokemon.domain.entity.PokemonInfo
 import ru.kpfu.itis.pokemon.domain.entity.PokemonStat
 import ru.kpfu.itis.pokemon.presentation.entity.DataState
+import ru.kpfu.itis.pokemon.presentation.pokemon_details.PokemonDetailsEffect
 import ru.kpfu.itis.pokemon.presentation.pokemon_details.PokemonDetailsUiEvent
 import ru.kpfu.itis.pokemon.presentation.pokemon_details.PokemonDetailsUiState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun PokemonDetailsScene(
     uiState: DataState<PokemonDetailsUiState>,
+    effect: PokemonDetailsEffect?,
     onUiEvent: (PokemonDetailsUiEvent) -> Unit
 ) {
-    LaunchedEffect(Unit) {
-        onUiEvent(PokemonDetailsUiEvent.Init)
+    val navigator = LocalNavigator.current
+    LaunchedEffect(effect) {
+        when (effect) {
+            PokemonDetailsEffect.GoBack -> navigator?.pop()
+            null -> Unit
+        }
     }
 
     Column {
+        TopAppBar(
+            title = {
+                Text(
+                    text = "Информация о покемоне",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            },
+            navigationIcon = {
+                IconButton(
+                    onClick = {
+                        onUiEvent(PokemonDetailsUiEvent.GoBackClick)
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_back),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                scrolledContainerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        )
+
         when (uiState) {
             is DataState.Done -> {
                 PokemonDetailsSceneContent(

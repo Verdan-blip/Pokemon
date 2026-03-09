@@ -11,20 +11,23 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.pokemon.domain.usecase.GetPokemonListUseCase
 
-class MainPageScreenModel(
+class PokemonListScreenModel(
     private val getPokemonListUseCase: GetPokemonListUseCase
 ) : ScreenModel {
-    private val _uiState = MutableStateFlow(MainPageUiState())
+    private val _uiState = MutableStateFlow(PokemonListUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _effect = Channel<MainPageEffect>()
+    private val _effect = Channel<PokemonListEffect>()
     val effect = _effect.receiveAsFlow()
 
-    fun onUiEvent(uiEvent: MainPageUiEvent) {
+    init {
+        onInit()
+    }
+
+    fun onUiEvent(uiEvent: PokemonListUiEvent) {
         when (uiEvent) {
-            is MainPageUiEvent.Init -> onInit()
-            is MainPageUiEvent.SearchTextChange -> onSearchTextChange()
-            is MainPageUiEvent.PokemonClick -> onPokemonClick(id = uiEvent.id)
+            is PokemonListUiEvent.SearchTextChange -> onSearchTextChange()
+            is PokemonListUiEvent.PokemonClick -> onPokemonClick(id = uiEvent.id)
         }
     }
 
@@ -42,7 +45,7 @@ class MainPageScreenModel(
     }
 
     private fun onPokemonClick(id: Int) = screenModelScope.launch {
-        _effect.send(MainPageEffect.OpenPokemonDetails(id = id))
+        _effect.send(PokemonListEffect.OpenPokemonDetails(id = id))
     }
 
     override fun onDispose() {

@@ -25,9 +25,11 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
+            implementation(compose.components.resources)
+
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.paging.runtime)
@@ -59,6 +61,7 @@ kotlin {
             implementation(libs.voyager.koin)
             implementation(libs.voyager.screenModel)
             implementation(libs.voyager.transitions)
+            implementation(libs.voyager.tabNavigator)
 
             implementation(libs.coil.compose)
             implementation(libs.coil.compose.core)

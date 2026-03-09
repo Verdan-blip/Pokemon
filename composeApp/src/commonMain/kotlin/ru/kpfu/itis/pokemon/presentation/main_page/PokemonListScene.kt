@@ -31,18 +31,14 @@ import ru.kpfu.itis.pokemon.presentation.pokemon_details.PokemonDetailsScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MainPageScene(
-    uiState: MainPageUiState,
-    onUiEvent: (MainPageUiEvent) -> Unit,
-    effect: MainPageEffect?,
+    uiState: PokemonListUiState,
+    onUiEvent: (PokemonListUiEvent) -> Unit,
+    effect: PokemonListEffect?,
 ) {
-    LaunchedEffect(Unit) {
-        onUiEvent(MainPageUiEvent.Init)
-    }
-
     val navigator = LocalNavigator.current
     LaunchedEffect(effect) {
         when (effect) {
-            is MainPageEffect.OpenPokemonDetails -> {
+            is PokemonListEffect.OpenPokemonDetails -> {
                 navigator?.push(PokemonDetailsScreen(id = effect.id))
             }
 
@@ -100,7 +96,7 @@ internal fun MainPageScene(
 @Composable
 private fun MainPageSceneContent(
     items: LazyPagingItems<PokemonInfo>,
-    onUiEvent: (MainPageUiEvent) -> Unit
+    onUiEvent: (PokemonListUiEvent) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -114,7 +110,7 @@ private fun MainPageSceneContent(
                 PokemonCard(
                     pokemon = pokemon,
                     onClick = {
-                        onUiEvent(MainPageUiEvent.PokemonClick(pokemon.id))
+                        onUiEvent(PokemonListUiEvent.PokemonClick(pokemon.id))
                     }
                 )
 
@@ -146,7 +142,7 @@ private fun MainPageSceneContent(
 @Composable
 private fun MainPageScenePreview() {
     MainPageScene(
-        uiState = MainPageUiState(),
+        uiState = PokemonListUiState(),
         onUiEvent = { },
         effect = null
     )

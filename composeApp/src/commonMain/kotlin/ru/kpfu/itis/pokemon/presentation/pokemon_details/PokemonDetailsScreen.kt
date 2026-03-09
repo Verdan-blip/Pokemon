@@ -19,9 +19,11 @@ class PokemonDetailsScreen(
         )
 
         val uiState by screenModel.uiState.collectAsStateWithLifecycle()
+        val effect by screenModel.effect.collectAsStateWithLifecycle(null)
 
         PokemonDetailsScene(
             uiState = uiState,
+            effect = effect,
             onUiEvent = screenModel::onUiEvent
         )
     }

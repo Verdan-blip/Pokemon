@@ -2,10 +2,12 @@ package ru.kpfu.itis.pokemon.presentation.pokemon_details
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.pokemon.domain.usecase.GetPokemonInfoUseCase
@@ -18,9 +20,16 @@ class PokemonDetailsScreenModel(
     private val _uiState = MutableStateFlow<DataState<PokemonDetailsUiState>>(DataState.Loading)
     val uiState = _uiState.asStateFlow()
 
+    private val _effect = Channel<PokemonDetailsEffect>()
+    val effect = _effect.receiveAsFlow()
+
+    init {
+        onInit()
+    }
+
     fun onUiEvent(uiEvent: PokemonDetailsUiEvent) {
         when (uiEvent) {
-            is PokemonDetailsUiEvent.Init -> onInit()
+            PokemonDetailsUiEvent.GoBackClick -> onGoBackClick()
         }
     }
 
@@ -39,16 +48,11 @@ class PokemonDetailsScreenModel(
             }
     }
 
-    override fun onDispose() {
-        super.onDispose()
+    private fun onGoBackClick() = screenModelScope.launch {
+        _effect.send(PokemonDetailsEffect.GoBack)
     }
 
-    class Factory(
-        private val getPokemonInfoUseCase: GetPokemonInfoUseCase
-    ) {
-        fun create(id: Int) = PokemonDetailsScreenModel(
-            id = id,
-            getPokemonInfoUseCase = getPokemonInfoUseCase
-        )
+    override fun onDispose() {
+        super.onDispose()
     }
 }
