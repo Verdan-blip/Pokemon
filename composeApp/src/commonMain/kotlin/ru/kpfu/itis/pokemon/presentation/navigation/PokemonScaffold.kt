@@ -1,11 +1,9 @@
 package ru.kpfu.itis.pokemon.presentation.navigation
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -22,9 +20,6 @@ import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
-import org.jetbrains.compose.resources.painterResource
-import pokemon.composeapp.generated.resources.Res
-import ru.kpfu.itis.pokemon.presentation.main_page.PokemonListScreen
 
 @Composable
 internal fun PokemonScaffold() {

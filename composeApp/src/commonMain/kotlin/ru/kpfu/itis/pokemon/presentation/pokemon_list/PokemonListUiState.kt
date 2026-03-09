@@ -1,4 +1,4 @@
-package ru.kpfu.itis.pokemon.presentation.main_page
+package ru.kpfu.itis.pokemon.presentation.pokemon_list
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.paging.PagingData

@@ -4,12 +4,14 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import co.pokeapi.pokekotlin.PokeApi
 import kotlinx.coroutines.flow.flow
+import ru.kpfu.itis.pokemon.data.dao.PokemonCacheDao
 import ru.kpfu.itis.pokemon.data.datasource.PokemonPagingSource
 import ru.kpfu.itis.pokemon.data.mapper.toPokemonInfo
 import ru.kpfu.itis.pokemon.domain.repository.PokemonRepository
 
 class PokemonRepositoryImpl(
     private val pokeApi: PokeApi,
+    private val dao: PokemonCacheDao,
     private val pokemonPagingSource: PokemonPagingSource.Factory
 ) : PokemonRepository {
 
@@ -21,15 +23,23 @@ class PokemonRepositoryImpl(
             prefetchDistance = 0
         )
     ) {
-        pokemonPagingSource.create(api = PokeApi, pageSize = PAGE_SIZE)
+        pokemonPagingSource.create(
+            api = PokeApi,
+            dao = dao,
+            pageSize = PAGE_SIZE
+        )
     }.flow
 
     override fun getPokemon(id: Int) = flow {
-        val pokemonInfo = pokeApi
-            .getPokemonVariety(id)
-            .toPokemonInfo()
+        var pokemon = dao.getPokemon(id)
 
-        emit(pokemonInfo)
+        if (pokemon == null) {
+            pokemon = pokeApi
+                .getPokemonVariety(id)
+                .toPokemonInfo()
+        }
+
+        emit(pokemon)
     }
 
     companion object {

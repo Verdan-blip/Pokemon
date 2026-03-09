@@ -1,4 +1,4 @@
-package ru.kpfu.itis.pokemon.presentation.main_page
+package ru.kpfu.itis.pokemon.presentation.pokemon_list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -27,10 +27,14 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import ru.kpfu.itis.pokemon.domain.entity.PokemonInfo
 import ru.kpfu.itis.pokemon.presentation.components.PokemonCard
 import ru.kpfu.itis.pokemon.presentation.pokemon_details.PokemonDetailsScreen
+import ru.kpfu.itis.pokemon.presentation.pokemon_details.PokemonDetailsUiEvent
+import ru.kpfu.itis.pokemon.presentation.uikit.KitErrorView
+import ru.kpfu.itis.pokemon.presentation.uikit.KitLoadingView
+import ru.kpfu.itis.pokemon.presentation.uikit.KitTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun MainPageScene(
+internal fun PokemonListScene(
     uiState: PokemonListUiState,
     onUiEvent: (PokemonListUiEvent) -> Unit,
     effect: PokemonListEffect?,
@@ -58,29 +62,11 @@ internal fun MainPageScene(
 
         when (pokemons.loadState.refresh) {
             is LoadState.Error -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Не удалось загрузить данные",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                }
+                KitErrorView()
             }
 
             LoadState.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
+                KitLoadingView()
             }
 
             is LoadState.NotLoading -> {
@@ -98,40 +84,54 @@ private fun MainPageSceneContent(
     items: LazyPagingItems<PokemonInfo>,
     onUiEvent: (PokemonListUiEvent) -> Unit
 ) {
-    LazyColumn(
+    Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        items(
-            items.itemCount,
-            key = { index -> items[index]?.name.orEmpty() }
-        ) { index ->
-            items[index]?.also { pokemon ->
-                PokemonCard(
-                    pokemon = pokemon,
-                    onClick = {
-                        onUiEvent(PokemonListUiEvent.PokemonClick(pokemon.id))
-                    }
-                )
+        KitTopBar(
+            title = "Покемоны"
+        )
 
-                Spacer(
-                    modifier = Modifier.height(12.dp)
-                )
-            }
-        }
-
-        if (items.loadState.append is LoadState.Loading) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .size(16.dp)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            items(
+                items.itemCount
+            ) { index ->
+                items[index]?.also { pokemon ->
+                    PokemonCard(
+                        pokemon = pokemon,
+                        onClick = {
+                            onUiEvent(PokemonListUiEvent.PokemonClick(pokemon.id))
+                        },
+                        onAddToFavourites = {
+                            onUiEvent(PokemonListUiEvent.AddToFavouritesClick(pokemon))
+                        },
+                        onRemoveFromFavourites = {
+                            onUiEvent(PokemonListUiEvent.AddToFavouritesClick(pokemon))
+                        }
                     )
+
+                    Spacer(
+                        modifier = Modifier.height(12.dp)
+                    )
+                }
+            }
+
+            if (items.loadState.append is LoadState.Loading) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(16.dp)
+                        )
+                    }
                 }
             }
         }
@@ -140,8 +140,8 @@ private fun MainPageSceneContent(
 
 @Preview
 @Composable
-private fun MainPageScenePreview() {
-    MainPageScene(
+private fun PokemonListScenePreview() {
+    PokemonListScene(
         uiState = PokemonListUiState(),
         onUiEvent = { },
         effect = null

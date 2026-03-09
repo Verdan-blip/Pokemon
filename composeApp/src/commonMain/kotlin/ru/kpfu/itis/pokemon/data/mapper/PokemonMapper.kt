@@ -21,7 +21,6 @@ internal fun Handle.Named<ApiPokemonVariety>.toPokemon(
 internal fun ApiPokemonVariety.toPokemonInfo() = PokemonInfo(
     id = id,
     name = name,
-    order = order,
     abilities = abilities
         .mapNotNull { it.ability }
         .map { it.name },

@@ -51,6 +51,7 @@ import ru.kpfu.itis.pokemon.presentation.entity.DataState
 import ru.kpfu.itis.pokemon.presentation.pokemon_details.PokemonDetailsEffect
 import ru.kpfu.itis.pokemon.presentation.pokemon_details.PokemonDetailsUiEvent
 import ru.kpfu.itis.pokemon.presentation.pokemon_details.PokemonDetailsUiState
+import ru.kpfu.itis.pokemon.presentation.uikit.KitTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,32 +68,13 @@ internal fun PokemonDetailsScene(
         }
     }
 
-    Column {
-        TopAppBar(
-            title = {
-                Text(
-                    text = "Информация о покемоне",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            },
-            navigationIcon = {
-                IconButton(
-                    onClick = {
-                        onUiEvent(PokemonDetailsUiEvent.GoBackClick)
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_back),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                scrolledContainerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        KitTopBar(
+            title = "Информация о покемоне",
+            onBack = { onUiEvent(PokemonDetailsUiEvent.GoBackClick) }
         )
 
         when (uiState) {

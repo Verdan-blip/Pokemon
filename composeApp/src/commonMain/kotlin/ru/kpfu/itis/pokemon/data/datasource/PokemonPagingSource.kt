@@ -3,11 +3,13 @@ package ru.kpfu.itis.pokemon.data.datasource
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import co.pokeapi.pokekotlin.PokeApi
+import ru.kpfu.itis.pokemon.data.dao.PokemonCacheDao
 import ru.kpfu.itis.pokemon.data.mapper.toPokemonInfo
 import ru.kpfu.itis.pokemon.domain.entity.PokemonInfo
 
 class PokemonPagingSource private constructor(
     private val pokeApi: PokeApi,
+    private val dao: PokemonCacheDao,
     private val pageSize: Int
 ) : PagingSource<Int, PokemonInfo>() {
 
@@ -21,9 +23,17 @@ class PokemonPagingSource private constructor(
 
             val pokemons = shortPokemons
                 .map {
-                    pokeApi
-                        .getPokemonVariety(id = it.id)
-                        .toPokemonInfo()
+                    var pokemon = dao.getPokemon(id = it.id)
+
+                    if (pokemon == null) {
+                        pokemon = pokeApi
+                            .getPokemonVariety(id = it.id)
+                            .toPokemonInfo()
+
+                        dao.insertPokemon(pokemon)
+                    }
+
+                    pokemon
                 }
 
             LoadResult.Page(
@@ -44,6 +54,12 @@ class PokemonPagingSource private constructor(
     }
 
     class Factory {
-        fun create(api: PokeApi, pageSize: Int) = PokemonPagingSource(api, pageSize)
+        fun create(api: PokeApi, dao: PokemonCacheDao, pageSize: Int): PokemonPagingSource {
+            return PokemonPagingSource(
+                pokeApi = api,
+                dao = dao,
+                pageSize = pageSize
+            )
+        }
     }
 }

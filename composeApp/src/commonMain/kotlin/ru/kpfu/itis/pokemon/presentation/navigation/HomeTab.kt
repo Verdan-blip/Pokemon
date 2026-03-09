@@ -8,7 +8,7 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import org.jetbrains.compose.resources.painterResource
 import pokemon.composeapp.generated.resources.Res
 import pokemon.composeapp.generated.resources.ic_home
-import ru.kpfu.itis.pokemon.presentation.main_page.PokemonListScreen
+import ru.kpfu.itis.pokemon.presentation.pokemon_list.PokemonListScreen
 
 object HomeTab : Tab {
 

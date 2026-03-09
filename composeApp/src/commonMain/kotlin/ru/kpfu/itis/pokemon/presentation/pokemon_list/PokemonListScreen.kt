@@ -1,4 +1,4 @@
-package ru.kpfu.itis.pokemon.presentation.main_page
+package ru.kpfu.itis.pokemon.presentation.pokemon_list
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,7 +14,7 @@ object PokemonListScreen : Screen {
         val uiState by screenModel.uiState.collectAsStateWithLifecycle()
         val effect by screenModel.effect.collectAsStateWithLifecycle(null)
 
-        MainPageScene(
+        PokemonListScene(
             uiState = uiState,
             onUiEvent = screenModel::onUiEvent,
             effect = effect

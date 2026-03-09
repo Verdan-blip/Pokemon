@@ -3,7 +3,6 @@ package ru.kpfu.itis.pokemon.domain.entity
 data class PokemonInfo(
     val id: Int,
     val name: String,
-    val order: Int,
     val abilities: List<String>,
     val moves: List<String>,
     val types: List<String>,
@@ -11,12 +10,12 @@ data class PokemonInfo(
     val sprites: PokemonSprites,
     val weight: Int,
     val height: Int,
+    val isFavourite: Boolean = false
 ) {
     companion object {
         fun mock() = PokemonInfo(
             id = 0,
             name = "pikachu",
-            order = 0,
             abilities = listOf("jump attack", "sonic speed"),
             moves = listOf("transform", "fly"),
             types = listOf("normal"),
