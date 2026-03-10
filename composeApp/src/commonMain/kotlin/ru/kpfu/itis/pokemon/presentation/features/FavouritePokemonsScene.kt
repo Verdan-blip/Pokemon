@@ -28,6 +28,10 @@ fun FavouritePokemonsScene(
     effect: FavouritePokemonsEffect?,
     onUiEvent: (FavouritePokemonsUiEvent) -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        onUiEvent(FavouritePokemonsUiEvent.Init)
+    }
+
     val navigator = LocalNavigator.current
     LaunchedEffect(effect) {
         when (effect) {

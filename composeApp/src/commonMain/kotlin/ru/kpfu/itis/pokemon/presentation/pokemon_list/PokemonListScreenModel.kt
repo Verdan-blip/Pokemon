@@ -6,6 +6,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,12 +26,9 @@ class PokemonListScreenModel(
     private val _effect = Channel<PokemonListEffect>()
     val effect = _effect.receiveAsFlow()
 
-    init {
-        onInit()
-    }
-
     fun onUiEvent(uiEvent: PokemonListUiEvent) {
         when (uiEvent) {
+            is PokemonListUiEvent.Init -> onInit()
             is PokemonListUiEvent.PokemonClick -> onPokemonClick(id = uiEvent.id)
             is PokemonListUiEvent.AddToFavouritesClick -> onAddToFavourites(uiEvent.pokemon)
             is PokemonListUiEvent.RemoveFromFavouritesClick -> onRemoveFromFavourites(uiEvent.pokemon)
@@ -46,12 +44,20 @@ class PokemonListScreenModel(
         }
     }
 
-    private fun onAddToFavourites(pokemon: PokemonInfo) {
+    private fun onAddToFavourites(pokemon: PokemonInfo) = screenModelScope.launch {
         addPokemonToFavouritesUseCase(pokemon = pokemon)
+            .catch {
+                println()
+            }
+            .collect {
+                println()
+            }
     }
 
-    private fun onRemoveFromFavourites(pokemon: PokemonInfo) {
+    private fun onRemoveFromFavourites(pokemon: PokemonInfo) = screenModelScope.launch {
         removePokemonFromFavouritesUseCase(pokemon = pokemon)
+            .catch {  }
+            .collect {  }
     }
 
     private fun onPokemonClick(id: Int) = screenModelScope.launch {

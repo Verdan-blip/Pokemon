@@ -39,6 +39,10 @@ internal fun PokemonListScene(
     onUiEvent: (PokemonListUiEvent) -> Unit,
     effect: PokemonListEffect?,
 ) {
+    LaunchedEffect(Unit) {
+        onUiEvent(PokemonListUiEvent.Init)
+    }
+
     val navigator = LocalNavigator.current
     LaunchedEffect(effect) {
         when (effect) {

@@ -6,5 +6,5 @@ import ru.kpfu.itis.pokemon.domain.repository.PokemonCacheRepository
 class RemovePokemonFromFavouritesUseCase(
     private val repository: PokemonCacheRepository
 ) {
-    operator fun invoke(pokemon: PokemonInfo) = repository.removeFromFavourites(id = pokemon.id)
+    operator fun invoke(pokemon: PokemonInfo) = repository.removeFromFavourites(pokemon)
 }

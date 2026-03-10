@@ -5,13 +5,13 @@ insertStat:
 INSERT INTO Stats(pokemon_id, name, value) VALUES (?, ?, ?);
 
 insertAbility:
-INSERT INTO Abilities(name) VALUES (?);
+INSERT INTO Abilities(name, pokemon_id) VALUES (?, ?);
 
 insertType:
-INSERT INTO Types(name) VALUES (?);
+INSERT INTO Types(name, pokemon_id) VALUES (?, ?);
 
 insertMove:
-INSERT INTO Moves(name) VALUES (?);
+INSERT INTO Moves(name, pokemon_id) VALUES (?, ?);
 
 insertFavorite:
 INSERT OR IGNORE INTO Favorites(pokemon_id) VALUES (?);
@@ -23,13 +23,13 @@ selectStatsByPokemonId:
 SELECT name, value FROM Stats WHERE pokemon_id = ?;
 
 selectMovesByPokemonId:
-SELECT name, value FROM Stats WHERE pokemon_id = ?;
+SELECT name FROM Moves WHERE pokemon_id = ?;
 
 selectTypesByPokemonId:
-SELECT name, value FROM Stats WHERE pokemon_id = ?;
+SELECT name FROM Types WHERE pokemon_id = ?;
 
 selectAbilitiesByPokemonId:
-SELECT name, value FROM Stats WHERE pokemon_id = ?;
+SELECT name FROM Abilities WHERE pokemon_id = ?;
 
 getOnlyFavorites:
 SELECT
@@ -48,6 +48,37 @@ SELECT EXISTS(
     FROM Favorites
     WHERE pokemon_id = ?
 );
+
+getFullPokemonDataById:
+SELECT
+    P.id, P.name, P.height, P.weigth, P.back_img, P.front_img,
+    S.name AS stat_name, S.value AS stat_value,
+    T.name AS type_name,
+    A.name AS ability_name,
+    M.name AS move_name,
+    (F.pokemon_id IS NOT NULL) AS is_favorite
+FROM Pokemons P
+LEFT JOIN Favorites F ON P.id = F.pokemon_id
+LEFT JOIN Stats S ON P.id = S.pokemon_id
+LEFT JOIN Types T ON P.id = T.pokemon_id
+LEFT JOIN Abilities A ON P.id = A.pokemon_id
+LEFT JOIN Moves M ON P.id = M.pokemon_id
+WHERE P.id = ?;
+
+getFavoriteFullPokemons:
+SELECT
+    P.id, P.name, P.height, P.weigth, P.back_img, P.front_img,
+    S.name AS stat_name, S.value AS stat_value,
+    T.name AS type_name,
+    A.name AS ability_name,
+    M.name AS move_name
+FROM Favorites F
+JOIN Pokemons P ON F.pokemon_id = P.id
+LEFT JOIN Stats S ON P.id = S.pokemon_id
+LEFT JOIN Types T ON P.id = T.pokemon_id
+LEFT JOIN Abilities A ON P.id = A.pokemon_id
+LEFT JOIN Moves M ON P.id = M.pokemon_id
+ORDER BY F.added_at DESC;
 
 getFavoritePokemons:
 SELECT

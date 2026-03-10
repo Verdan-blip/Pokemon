@@ -19,14 +19,14 @@ class PokemonCacheRepositoryImpl(
         emit(Unit)
     }
 
-    override fun addToFeatures(id: Int) = flow {
-        dao.addToFeatures(id)
+    override fun addToFeatures(pokemon: PokemonInfo) = flow {
+        dao.addToFeatures(pokemon)
 
         emit(Unit)
     }
 
-    override fun removeFromFavourites(id: Int) = flow {
-        dao.removeFromFeatures(id)
+    override fun removeFromFavourites(pokemon: PokemonInfo) = flow {
+        dao.removeFromFeatures(pokemon)
 
         emit(Unit)
     }

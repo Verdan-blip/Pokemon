@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -60,6 +61,10 @@ internal fun PokemonDetailsScene(
     effect: PokemonDetailsEffect?,
     onUiEvent: (PokemonDetailsUiEvent) -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        onUiEvent(PokemonDetailsUiEvent.Init)
+    }
+
     val navigator = LocalNavigator.current
     LaunchedEffect(effect) {
         when (effect) {
@@ -169,7 +174,7 @@ private fun PokemonDetailsSceneContent(
         Spacer(modifier = Modifier.height(4.dp))
 
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             pokemon.types.forEach { type ->
                 SuggestionChip(
                     onClick = { },
@@ -226,8 +231,9 @@ private fun PokemonAbilitiesSection(abilities: List<String>) {
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        Row(
+        FlowRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
             abilities.forEach { ability ->
@@ -242,6 +248,7 @@ private fun PokemonAbilitiesSection(abilities: List<String>) {
                     Text(
                         text = ability.replace("-", " ").replaceFirstChar { it.uppercase() },
                         style = MaterialTheme.typography.bodyLarge,
+                        maxLines = 1,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         fontWeight = FontWeight.Medium,
                         textAlign = TextAlign.Center

@@ -28,12 +28,9 @@ class FavouritePokemonsScreenModel(
     private val _effect = Channel<FavouritePokemonsEffect>()
     val effect = _effect.receiveAsFlow()
 
-    init {
-        onInit()
-    }
-
     fun onUiEvent(uiEvent: FavouritePokemonsUiEvent) {
         when (uiEvent) {
+            is FavouritePokemonsUiEvent.Init -> onInit()
             is FavouritePokemonsUiEvent.Click -> onPokemonClick(uiEvent.pokemon)
             is FavouritePokemonsUiEvent.Remove -> onRemoveClick(uiEvent.pokemon)
         }

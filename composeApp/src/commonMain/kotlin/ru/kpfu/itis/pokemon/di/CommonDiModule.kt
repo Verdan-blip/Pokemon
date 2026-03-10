@@ -5,19 +5,16 @@ import ru.kpfu.itis.pokemon.PokemonDataBase
 import ru.kpfu.itis.pokemon.data.di.dataModule
 import ru.kpfu.itis.pokemon.domain.di.domainModule
 import ru.kpfu.itis.pokemon.platform.DatabaseDriverFactory
+import ru.kpfu.itis.pokemon.platform.createDataBase
 import ru.kpfu.itis.pokemon.presentation.di.presentationModule
 
 val commonDiModule = module {
     includes(
         dataModule,
         domainModule,
-        presentationModule
+        presentationModule,
+        platformModule
     )
 
-    includes(platformModule)
-
-    single<PokemonDataBase> {
-        val driver = get<DatabaseDriverFactory>().createDriver()
-        PokemonDataBase(driver)
-    }
+    single<PokemonDataBase> { PokemonDataBase(driver = get()) }
 }

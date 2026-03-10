@@ -23,12 +23,9 @@ class PokemonDetailsScreenModel(
     private val _effect = Channel<PokemonDetailsEffect>()
     val effect = _effect.receiveAsFlow()
 
-    init {
-        onInit()
-    }
-
     fun onUiEvent(uiEvent: PokemonDetailsUiEvent) {
         when (uiEvent) {
+            PokemonDetailsUiEvent.Init -> onInit()
             PokemonDetailsUiEvent.GoBackClick -> onGoBackClick()
         }
     }

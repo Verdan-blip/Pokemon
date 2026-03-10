@@ -6,8 +6,5 @@ import ru.kpfu.itis.pokemon.domain.repository.PokemonCacheRepository
 class AddPokemonToFavouritesUseCase(
     private val repository: PokemonCacheRepository
 ) {
-    operator fun invoke(pokemon: PokemonInfo) {
-        repository.insertPokemon(pokemon = pokemon)
-        repository.addToFeatures(id = pokemon.id)
-    }
+    operator fun invoke(pokemon: PokemonInfo) = repository.addToFeatures(pokemon)
 }

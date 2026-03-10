@@ -21,12 +21,9 @@ class RandomPokemonScreenModel(
     private val _uiState = MutableStateFlow<DataState<RandomPokemonUiState>>(DataState.Loading)
     val uiState = _uiState.asStateFlow()
 
-    init {
-        onInit()
-    }
-
     fun onUiEvent(uiEvent: RandomPokemonUiEvent) {
         when (uiEvent) {
+            RandomPokemonUiEvent.Init -> onInit()
             RandomPokemonUiEvent.SpinClick -> onSpinClick()
         }
     }

@@ -1,16 +1,22 @@
 CREATE TABLE "Abilities" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "name" TEXT
+    "pokemon_id" INTEGER,
+    "name" TEXT,
+    FOREIGN KEY ("pokemon_id") REFERENCES "Pokemons" ("id") ON DELETE CASCADE
 );
 
 CREATE TABLE "Types" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "name" TEXT
+    "pokemon_id" INTEGER,
+    "name" TEXT,
+    FOREIGN KEY ("pokemon_id") REFERENCES "Pokemons" ("id") ON DELETE CASCADE
 );
 
 CREATE TABLE "Moves" (
     "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-    "name" TEXT
+    "pokemon_id" INTEGER,
+    "name" TEXT,
+    FOREIGN KEY ("pokemon_id") REFERENCES "Pokemons" ("id") ON DELETE CASCADE
 );
 
 CREATE TABLE "Stats" (
@@ -56,7 +62,8 @@ CREATE TABLE "PokemonTypes" (
 
 
 CREATE TABLE "Favorites" (
-    "pokemon_id" INTEGER PRIMARY KEY,
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "pokemon_id" INTEGER,
     "added_at" INTEGER DEFAULT (strftime('%s', 'now')),
     FOREIGN KEY ("pokemon_id") REFERENCES "Pokemons" ("id") ON DELETE CASCADE
 );

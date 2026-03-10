@@ -1,6 +1,7 @@
 package ru.kpfu.itis.pokemon.data.dao
 
 import ru.kpfu.itis.pokemon.Pokemon_crudsQueries
+import ru.kpfu.itis.pokemon.domain.entity.Pokemon
 import ru.kpfu.itis.pokemon.domain.entity.PokemonInfo
 import ru.kpfu.itis.pokemon.domain.entity.PokemonSprites
 import ru.kpfu.itis.pokemon.domain.entity.PokemonStat
@@ -9,50 +10,29 @@ class PokemonCacheDao(
     private val queries: Pokemon_crudsQueries
 ) {
     fun getPokemon(id: Int): PokemonInfo? {
-        val pokemon = queries
-            .selectPokemonById(id.toLong())
-            .executeAsOneOrNull()
-            ?: return null
-
-        val stats = queries
-            .selectStatsByPokemonId(id.toLong())
+        val rows = queries
+            .getFullPokemonDataById(id = id.toLong())
             .executeAsList()
 
-        val moves = queries
-            .selectMovesByPokemonId(id.toLong())
-            .executeAsList()
+        if (rows.isEmpty()) return null
 
-        val abilities = queries
-            .selectMovesByPokemonId(id.toLong())
-            .executeAsList()
-
-        val types = queries
-            .selectTypesByPokemonId(id.toLong())
-            .executeAsList()
-
-        val isAddedToFavourites = queries
-            .isFavorite(id.toLong())
-            .executeAsOneOrNull()
+        val first = rows.first()
 
         return PokemonInfo(
-            id = pokemon.id.toInt(),
-            name = pokemon.name.orEmpty(),
-            abilities = abilities.mapNotNull { it.name },
-            moves = moves.mapNotNull { it.name },
-            stats = stats.map {
-                PokemonStat(
-                    name = it.name.orEmpty(),
-                    value = it.value_?.toInt() ?: 0
-                )
-            },
-            types = types.map { it.name.orEmpty() },
-            sprites = PokemonSprites(
-                frontUrl = pokemon.front_img,
-                backUrl = pokemon.back_img
-            ),
-            weight = pokemon.weigth?.toInt() ?: 0,
-            height = pokemon.height?.toInt() ?: 0,
-            isFavourite = isAddedToFavourites ?: false
+            id = first.id.toInt(),
+            name = first.name.orEmpty(),
+            weight = first.weigth?.toInt() ?: 0,
+            height = first.height?.toInt() ?: 0,
+            sprites = PokemonSprites(frontUrl = first.front_img, backUrl = first.back_img),
+            types = rows.mapNotNull { it.type_name }.distinct(),
+            abilities = rows.mapNotNull { it.ability_name }.distinct(),
+            moves = rows.mapNotNull { it.move_name }.distinct(),
+            stats = rows.mapNotNull { row ->
+                if (row.stat_name != null) {
+                    PokemonStat(row.stat_name, row.stat_value?.toInt() ?: 0)
+                } else null
+            }.distinctBy { it.name },
+            isFavourite = first.is_favorite
         )
     }
 
@@ -73,7 +53,10 @@ class PokemonCacheDao(
                 front_img = pokemon.sprites.frontUrl
             )
 
-            pokemon.abilities.forEach { queries.insertAbility(it) }
+            pokemon.abilities.forEach {
+                queries.insertAbility(pokemon_id = id, name = it)
+            }
+
             pokemon.stats.forEach {
                 queries.insertStat(
                     pokemon_id = id,
@@ -81,23 +64,51 @@ class PokemonCacheDao(
                     value_ = it.value.toLong()
                 )
             }
-            pokemon.moves.forEach { queries.insertMove(it) }
-            pokemon.types.forEach { queries.insertType(it) }
+
+            pokemon.moves.forEach {
+                queries.insertMove(pokemon_id = id, name = it)
+            }
+
+            pokemon.types.forEach {
+                queries.insertType(pokemon_id = id, name = it)
+            }
         }
     }
 
-    fun addToFeatures(id: Int) {
-        queries.insertFavorite(pokemon_id = id.toLong())
+    fun addToFeatures(pokemon: PokemonInfo) {
+        queries.insertFavorite(pokemon_id = pokemon.id.toLong())
     }
 
-    fun removeFromFeatures(id: Int) {
-        queries.removeFavorite(pokemon_id = id.toLong())
+    fun removeFromFeatures(pokemon: PokemonInfo) {
+        queries.removeFavorite(pokemon_id = pokemon.id.toLong())
     }
 
     fun getAllFavourites(): List<PokemonInfo> {
-        return queries
-            .getFavoritePokemons()
+        val rows = queries
+            .getFavoriteFullPokemons()
             .executeAsList()
-            .mapNotNull { getPokemon(it.id.toInt()) }
+
+        return rows.groupBy { it.id }.map { (id, pokemonRows) ->
+            val first = pokemonRows.first()
+
+            PokemonInfo(
+                id = id.toInt(),
+                name = first.name.orEmpty(),
+                weight = first.weigth?.toInt() ?: 0,
+                height = first.height?.toInt() ?: 0,
+                sprites = PokemonSprites(frontUrl = first.front_img, backUrl = first.back_img),
+                types = pokemonRows.mapNotNull { it.type_name }.distinct(),
+                abilities = pokemonRows.mapNotNull { it.ability_name }.distinct(),
+                moves = pokemonRows.mapNotNull { it.move_name }.distinct(),
+                stats = pokemonRows.mapNotNull { row ->
+                    if (row.stat_name != null) {
+                        PokemonStat(name = row.stat_name, value = row.stat_value?.toInt() ?: 0)
+                    } else {
+                        null
+                    }
+                }.distinctBy { it.name },
+                isFavourite = true
+            )
+        }
     }
 }

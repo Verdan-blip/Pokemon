@@ -24,6 +24,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,6 +47,10 @@ internal fun RandomPokemonScene(
     uiState: DataState<RandomPokemonUiState>,
     onUiEvent: (RandomPokemonUiEvent) -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        onUiEvent(RandomPokemonUiEvent.Init)
+    }
+
     when (uiState) {
         is DataState.Done -> {
             RandomPokemonSceneContent(
@@ -73,11 +78,10 @@ private fun RandomPokemonSceneContent(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
+            .padding(16.dp)
     ) {
         KitTopBar(
-            title = "Случайный покемон",
-            modifier = Modifier
-                .align(Alignment.TopStart)
+            title = "Случайный покемон"
         )
 
         Column(
@@ -103,10 +107,10 @@ private fun RandomPokemonSceneContent(
                 AnimatedContent(
                     targetState = uiState.isSpinning,
                     transitionSpec = {
-                        fadeIn(animationSpec = tween(500)) togetherWith fadeOut(
-                            animationSpec = tween(
-                                500
-                            )
+                        fadeIn(
+                            animationSpec = tween(500)
+                        ) togetherWith fadeOut(
+                            animationSpec = tween(500)
                         )
                     },
                     label = "SlotAnimation"
@@ -133,7 +137,9 @@ private fun RandomPokemonSceneContent(
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
                 enabled = uiState.isSpinning.not(),
-                shape = CircleShape
+                shape = CircleShape,
+                modifier = Modifier
+                    .height(64.dp)
             ) {
                 Text(
                     text = if (uiState.isSpinning) {
